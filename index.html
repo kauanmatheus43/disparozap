@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0f0d">
+  <meta name="description" content="Painel local para organizar contatos autorizados, produtos e campanhas.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <title>disparozap</title>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">d</span><div><strong>disparozap</strong><small>PAINEL DE OFERTAS</small></div></div>
+      <nav class="nav" aria-label="Navegação principal">
+        <button class="nav-item active" data-page="dashboard"><span>▦</span> Dashboard</button>
+        <button class="nav-item" data-page="contacts"><span>♙</span> Contatos</button>
+        <button class="nav-item" data-page="products"><span>◇</span> Produtos</button>
+        <button class="nav-item" data-page="campaigns"><span>➤</span> Campanhas</button>
+        <button class="nav-item" data-page="history"><span>◷</span> Histórico</button>
+      </nav>
+      <div class="sidebar-note"><span class="status-dot"></span> Modo local<br><small>Sem envio conectado</small></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Abrir menu">☰</button>
+        <div><p class="eyebrow" id="eyebrow">VISÃO GERAL</p><h1 id="pageTitle">Dashboard</h1></div>
+        <div class="top-actions"><span class="local-pill"><span class="status-dot"></span> Ambiente de teste</span><button class="primary small" data-goto="campaigns">＋ Nova campanha</button></div>
+      </header>
+
+      <section class="page active" id="page-dashboard">
+        <div class="welcome"><div><p class="eyebrow green">SEU PAINEL COMERCIAL</p><h2>Organize suas ofertas.<br><span>Controle seus contatos.</span></h2><p class="muted">Gerencie contatos com autorização, produtos afiliados e rascunhos de campanhas em um só lugar.</p></div><div class="welcome-icon">↗</div></div>
+        <div class="notice"><strong>Importante:</strong> este MVP guarda dados neste navegador. Ele não extrai participantes de grupos e não envia mensagens pelo WhatsApp. O envio real exige integração oficial configurada separadamente.</div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-icon">♙</div><p>Contatos cadastrados</p><strong id="statContacts">0</strong><small id="statConsented">0 com consentimento ativo</small></article>
+          <article class="stat-card"><div class="stat-icon">◇</div><p>Produtos no catálogo</p><strong id="statProducts">0</strong><small>Shopee e Mercado Livre</small></article>
+          <article class="stat-card"><div class="stat-icon">➤</div><p>Campanhas criadas</p><strong id="statCampaigns">0</strong><small>Rascunhos e testes locais</small></article>
+          <article class="stat-card"><div class="stat-icon">✓</div><p>Descadastros</p><strong id="statOptouts">0</strong><small>Contatos bloqueados para campanhas</small></article>
+        </div>
+        <div class="two-col">
+          <section class="panel"><div class="panel-head"><div><h3>Acesso rápido</h3><p>Continue de onde parou</p></div></div><div class="quick-actions"><button class="quick-action" data-goto="contacts"><span class="qa-icon">＋</span><span><b>Adicionar contato</b><small>Registre a autorização de recebimento</small></span><span class="chevron">›</span></button><button class="quick-action" data-goto="products"><span class="qa-icon">◇</span><span><b>Cadastrar produto</b><small>Adicione seu link de afiliado</small></span><span class="chevron">›</span></button><button class="quick-action" data-goto="campaigns"><span class="qa-icon">➤</span><span><b>Criar campanha</b><small>Monte uma mensagem para revisar</small></span><span class="chevron">›</span></button></div></section>
+          <section class="panel"><div class="panel-head"><div><h3>Atividade recente</h3><p>Últimas ações no painel</p></div><button class="text-button" data-goto="history">Ver histórico →</button></div><div id="recentActivity" class="empty-state compact"><span class="empty-icon">◷</span><b>Nenhuma atividade ainda</b><small>Suas ações aparecerão aqui.</small></div></section>
+        </div>
+      </section>
+
+      <section class="page" id="page-contacts">
+        <div class="section-intro"><div><h2>Contatos</h2><p>Cadastre somente pessoas que autorizaram receber ofertas.</p></div><button class="primary" id="addContactBtn">＋ Novo contato</button></div>
+        <div class="toolbar"><input id="contactSearch" class="search" placeholder="Buscar por nome ou telefone…" aria-label="Buscar contatos"><select id="contactFilter" aria-label="Filtrar contatos"><option value="all">Todos os contatos</option><option value="active">Consentimento ativo</option><option value="optout">Descadastrados</option><option value="pending">Sem consentimento confirmado</option></select><button class="secondary" id="importContactsBtn">Importar CSV</button><button class="secondary" id="exportContactsBtn">Exportar CSV</button><input id="importContactsFile" type="file" accept=".csv,text/csv" hidden></div>
+        <div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Contato</th><th>Telefone</th><th>Consentimento</th><th>Data</th><th>Ações</th></tr></thead><tbody id="contactsTable"></tbody></table></div><div id="contactsEmpty" class="empty-state"><span class="empty-icon">♙</span><b>Sua lista começa aqui</b><small>Adicione contatos manualmente ou importe um CSV.</small><button class="secondary" id="emptyAddContact">＋ Cadastrar contato</button></div></div>
+        <p class="helper">Dica: registre quando e como a pessoa autorizou receber mensagens. Participar de um grupo, por si só, não equivale a consentimento para mensagens promocionais privadas.</p>
+      </section>
+
+      <section class="page" id="page-products">
+        <div class="section-intro"><div><h2>Produtos</h2><p>Organize os produtos e seus links de afiliado.</p></div><button class="primary" id="addProductBtn">＋ Novo produto</button></div>
+        <div class="toolbar"><input id="productSearch" class="search" placeholder="Buscar produto…" aria-label="Buscar produtos"><select id="productFilter" aria-label="Filtrar plataforma"><option value="all">Todas as plataformas</option><option value="Shopee">Shopee</option><option value="Mercado Livre">Mercado Livre</option></select></div>
+        <div id="productsGrid" class="products-grid"></div>
+        <div id="productsEmpty" class="empty-state panel"><span class="empty-icon">◇</span><b>Nenhum produto cadastrado</b><small>Adicione nome, preço e link de afiliado.</small><button class="secondary" id="emptyAddProduct">＋ Cadastrar produto</button></div>
+      </section>
+
+      <section class="page" id="page-campaigns">
+        <div class="section-intro"><div><h2>Campanhas</h2><p>Crie e revise mensagens antes de qualquer envio.</p></div></div>
+        <div class="campaign-layout">
+          <form id="campaignForm" class="panel form-panel">
+            <div class="panel-head"><div><h3>Nova campanha</h3><p>O MVP salva como rascunho local.</p></div><span class="tag tag-muted">SEM ENVIO</span></div>
+            <label for="campaignName">Nome da campanha</label><input id="campaignName" required maxlength="80" placeholder="Ex.: Ofertas da semana">
+            <label for="campaignProduct">Produto para divulgar (opcional)</label><select id="campaignProduct"><option value="">Sem produto vinculado</option></select>
+            <label for="campaignAudience">Público</label><select id="campaignAudience"><option value="all">Todos com consentimento ativo</option><option value="manual">Somente eu vou revisar a lista</option></select>
+            <label for="campaignMessage">Mensagem</label><textarea id="campaignMessage" required rows="6" maxlength="2000" placeholder="Olá, {{nome}}! Confira esta oferta: {{link}}"></textarea>
+            <div class="field-hint">Variáveis disponíveis: <code>{{nome}}</code> e <code>{{link}}</code>.</div>
+            <div class="campaign-summary"><div><span>Contatos elegíveis</span><strong id="eligibleCount">0</strong></div><div><span>Caracteres</span><strong id="charCount">0/2000</strong></div></div>
+            <div class="form-actions"><button type="button" class="secondary" id="previewCampaignBtn">Pré-visualizar</button><button type="submit" class="primary">Salvar rascunho</button></div>
+          </form>
+          <aside class="panel side-panel"><div class="panel-head"><div><h3>Antes de enviar</h3><p>Checklist da campanha</p></div></div><ul class="checklist"><li><span>✓</span> Confirme a autorização dos destinatários.</li><li><span>✓</span> Respeite quem pediu para sair.</li><li><span>✓</span> Use modelos aprovados quando exigidos pela plataforma.</li><li><span>!</span> Envio real não está conectado neste MVP.</li></ul><div class="preview-box"><div class="preview-top"><span class="preview-avatar">d</span><div><b>Prévia da mensagem</b><small>Simulação local</small></div></div><div id="campaignPreview" class="preview-message">Sua mensagem aparecerá aqui.</div></div></aside>
+        </div>
+        <div class="panel mt"><div class="panel-head"><div><h3>Campanhas salvas</h3><p>Rascunhos criados neste dispositivo</p></div></div><div id="campaignList" class="campaign-list"></div><div id="campaignsEmpty" class="empty-state compact"><b>Nenhuma campanha ainda</b><small>Crie uma mensagem e salve como rascunho.</small></div></div>
+      </section>
+
+      <section class="page" id="page-history">
+        <div class="section-intro"><div><h2>Histórico</h2><p>Registro local de alterações e atividades.</p></div><button class="secondary" id="clearHistoryBtn">Limpar histórico</button></div>
+        <div class="panel"><div id="historyList" class="history-list"></div><div id="historyEmpty" class="empty-state"><span class="empty-icon">◷</span><b>Nenhuma atividade registrada</b><small>Criações, edições e descadastros aparecerão aqui.</small></div></div>
+      </section>
+
+      <footer class="footer"><span>disparozap · MVP local</span><span>Seus dados ficam neste navegador neste protótipo.</span></footer>
+    </main>
+  </div>
+
+  <dialog id="contactDialog" class="modal">
+    <form id="contactForm" method="dialog">
+      <div class="modal-head"><div><p class="eyebrow green">AGENDA DE CONTATOS</p><h2 id="contactDialogTitle">Novo contato</h2></div><button type="button" class="icon-button" data-close="contactDialog" aria-label="Fechar">×</button></div>
+      <input type="hidden" id="contactId">
+      <label for="contactName">Nome</label><input id="contactName" required maxlength="100" placeholder="Nome da pessoa">
+      <label for="contactPhone">Telefone com DDI</label><input id="contactPhone" required inputmode="tel" placeholder="Ex.: +55 11 99999-9999">
+      <label for="contactSource">Como a pessoa chegou até você?</label><select id="contactSource"><option>Cadastro voluntário</option><option>Formulário de ofertas</option><option>Cliente existente</option><option>Outro</option></select>
+      <label class="consent-row"><input id="contactConsent" type="checkbox"><span><b>Consentimento confirmado</b><small>A pessoa autorizou receber ofertas pelo WhatsApp.</small></span></label>
+      <label for="contactConsentDate">Data da autorização (se confirmada)</label><input id="contactConsentDate" type="date">
+      <label for="contactNotes">Observações (opcional)</label><textarea id="contactNotes" rows="2" maxlength="300" placeholder="Ex.: autorizou no formulário"></textarea>
+      <div class="modal-actions"><button type="button" class="secondary" data-close="contactDialog">Cancelar</button><button type="submit" class="primary">Salvar contato</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="productDialog" class="modal">
+    <form id="productForm" method="dialog">
+      <div class="modal-head"><div><p class="eyebrow green">CATÁLOGO</p><h2 id="productDialogTitle">Novo produto</h2></div><button type="button" class="icon-button" data-close="productDialog" aria-label="Fechar">×</button></div>
+      <input type="hidden" id="productId">
+      <label for="productName">Nome do produto</label><input id="productName" required maxlength="120" placeholder="Ex.: Fone Bluetooth">
+      <label for="productPlatform">Plataforma</label><select id="productPlatform"><option>Shopee</option><option>Mercado Livre</option></select>
+      <div class="form-row"><div><label for="productPrice">Preço (R$)</label><input id="productPrice" inputmode="decimal" placeholder="49,90"></div><div><label for="productCategory">Categoria</label><input id="productCategory" maxlength="60" placeholder="Eletrônicos"></div></div>
+      <label for="productLink">Link do produto/afiliado</label><input id="productLink" type="url" required placeholder="https://…">
+      <label for="productImage">URL da imagem (opcional)</label><input id="productImage" type="url" placeholder="https://…">
+      <label for="productDescription">Descrição curta (opcional)</label><textarea id="productDescription" rows="2" maxlength="300" placeholder="Destaque principal do produto"></textarea>
+      <div class="modal-actions"><button type="button" class="secondary" data-close="productDialog">Cancelar</button><button type="submit" class="primary">Salvar produto</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="previewDialog" class="modal">
+    <div class="modal-head"><div><p class="eyebrow green">PRÉ-VISUALIZAÇÃO</p><h2>Revisar mensagem</h2></div><button type="button" class="icon-button" data-close="previewDialog" aria-label="Fechar">×</button></div>
+    <p class="muted">Esta é uma simulação. Nenhuma mensagem será enviada.</p>
+    <div id="fullPreview" class="full-preview"></div>
+    <div class="modal-actions"><button type="button" class="primary" data-close="previewDialog">Entendi</button></div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>
